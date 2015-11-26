@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+./osmfilter graz_all.osm --keep="amenity=restaurant =bar =biergarten =cafe =fast-food =pub" | ./osmconvert - --all-to-nodes --csv="@id @lon @lat wheelchair amenity name" --csv-headline | grep -Ev [[:space:]]$ | mysql --user=softarch_user --password=12345 --local-infile=1 -e 'USE SA2015; DROP TABLE IF EXISTS Amenity; CREATE TABLE Amenity (ID BIGINT NOT NULL AUTO_INCREMENT, Longitude FLOAT(10,7) NOT NULL, Latitude FLOAT(9,7) NOT NULL, Wheelchair VARCHAR(7), Type VARCHAR(255) NOT NULL, Name VARCHAR(255) NOT NULL, PRIMARY KEY(ID)); ALTER TABLE Amenity AUTO_INCREMENT=3000000000000000; LOAD DATA LOCAL INFILE "/dev/stdin" INTO TABLE Amenity IGNORE 1 LINES;' ; rm graz_all.osm

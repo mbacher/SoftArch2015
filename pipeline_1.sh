@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+./osmconvert austria-latest.osm -B=Graz.poly -o=graz_all.osm ; ./osmfilter graz_all.osm --keep="highway=bus_stop railway=tram_stop" | ./osmconvert - --all-to-nodes --csv="@id @lon @lat wheelchair name" --csv-headline | grep -Ev [[:space:]]$ | mysql --user=softarch_user --password=12345 --local-infile=1 -e 'CREATE DATABASE IF NOT EXISTS SA2015 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci; USE SA2015; DROP TABLE IF EXISTS Stop; CREATE TABLE Stop (ID BIGINT NOT NULL AUTO_INCREMENT, Longitude FLOAT(10,7) NOT NULL, Latitude FLOAT(9,7) NOT NULL, Wheelchair VARCHAR(7), Name VARCHAR(255) NOT NULL, PRIMARY KEY (ID)); ALTER TABLE Amenity AUTO_INCREMENT=4000000000000000; LOAD DATA LOCAL INFILE "/dev/stdin" INTO TABLE Stop IGNORE 1 LINES;'
